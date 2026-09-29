@@ -72,4 +72,6 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 /[Aa]ssets/UMA/Examples
-/[Aa]ssets/UMA/Getting Started
+/[Aa]ssets/UMA/Getting Started/*
+!/[Aa]ssets/UMA/Getting Started/UMA_GLIB.prefab
+!/[Aa]ssets/UMA/Getting Started/UMA_GLIB.prefab.meta
