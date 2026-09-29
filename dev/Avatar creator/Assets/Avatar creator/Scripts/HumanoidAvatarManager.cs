@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UMA;
 using UMA.CharacterSystem;
 using UnityEngine;
-using UMA.CharacterSystem.Examples;
 using static UMA.CharacterSystem.DynamicCharacterAvatar;
 using System;
 using Pixelplacement;

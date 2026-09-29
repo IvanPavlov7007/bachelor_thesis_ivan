@@ -6,7 +6,6 @@ using System;
 using UMA;
 using UMA.CharacterSystem;
 using UnityEngine;
-using UMA.CharacterSystem.Examples;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
@@ -236,12 +235,12 @@ public class HumanoidAvatarCreator : MonoBehaviour
     /// </summary>
     /// <param name="regexPattern"></param>
     /// <returns></returns>
-    public List<DNAPanel.DNAHolder> getSpecificDNAHolders(string regexPattern)
+    public List<AvatarDNAHolder> getSpecificDNAHolders(string regexPattern)
     {
         Regex regex = new Regex(regexPattern, RegexOptions.IgnoreCase);
 
         UMADnaBase[] DNA = humanoidAvatar.GetAllDNA();
-        List<DNAPanel.DNAHolder> ValidDNA = new List<DNAPanel.DNAHolder>();
+        List<AvatarDNAHolder> ValidDNA = new List<AvatarDNAHolder>();
         for (int i1 = 0; i1 < DNA.Length; i1++)
         {
             UMADnaBase d = DNA[i1];
@@ -253,22 +252,22 @@ public class HumanoidAvatarCreator : MonoBehaviour
                 string name = names[i];
                 if (regex.IsMatch(name))
                 {
-                    ValidDNA.Add(new DNAPanel.DNAHolder(name, values[i], i, d));
+                    ValidDNA.Add(new AvatarDNAHolder(name, values[i], i, d));
                 }
             }
 
         }
 
-        ValidDNA.Sort();
+        ValidDNA.Sort((a, b) => string.Compare(a.name, b.name, StringComparison.OrdinalIgnoreCase));
         return ValidDNA;
     }
 
-    public List<DNASlider> instantiateDNASliders(List<DNAPanel.DNAHolder> ValidDNA)
+    public List<DNASlider> instantiateDNASliders(List<AvatarDNAHolder> ValidDNA)
     {
         List<DNASlider> result = new List<DNASlider>();
         for (int i = 0; i < ValidDNA.Count; i++)
         {
-            DNAPanel.DNAHolder dna = ValidDNA[i];
+            AvatarDNAHolder dna = ValidDNA[i];
             GameObject go = GameObject.Instantiate(DNA_SliderPrefab, UI_Content);
             DNASlider de = go.GetComponentInChildren<DNASlider>();
             de.SetUp(dna.name.BreakupCamelCase(), dna.index, dna.dnaBase, humanoidAvatar, dna.value);
@@ -382,6 +381,25 @@ public class HumanoidAvatarCreator : MonoBehaviour
 }
 
 /// <summary>
+/// A DNA value and its position in the owning UMA DNA array.
+/// </summary>
+public readonly struct AvatarDNAHolder
+{
+    public readonly string name;
+    public readonly float value;
+    public readonly int index;
+    public readonly UMADnaBase dnaBase;
+
+    public AvatarDNAHolder(string name, float value, int index, UMADnaBase dnaBase)
+    {
+        this.name = name;
+        this.value = value;
+        this.index = index;
+        this.dnaBase = dnaBase;
+    }
+}
+
+/// <summary>
 /// Base State
 /// </summary>
 public abstract class CreatorState
@@ -416,7 +434,7 @@ public class BodyState : CreatorState
 
     void reloadDNA_Sliders()
     {
-        List<DNAPanel.DNAHolder> ValidDNA = context.getSpecificDNAHolders(context.bodyDNAsRegex);
+        List<AvatarDNAHolder> ValidDNA = context.getSpecificDNAHolders(context.bodyDNAsRegex);
         var sliders = context.instantiateDNASliders(ValidDNA);
     }
 }
@@ -438,7 +456,7 @@ public class HeadState : CreatorState
 
     void reloadDNA_Sliders()
     {
-        List<DNAPanel.DNAHolder> ValidDNA = context.getSpecificDNAHolders(context.headDNAsRegex);
+        List<AvatarDNAHolder> ValidDNA = context.getSpecificDNAHolders(context.headDNAsRegex);
         context.instantiateDNASliders(ValidDNA);
     }
 
@@ -502,7 +520,7 @@ public class SkinState : CreatorState
 
     void reloadDNA_Sliders()
     {
-        List<DNAPanel.DNAHolder> ValidDNA = context.getSpecificDNAHolders(context.skinDNAsRegex);
+        List<AvatarDNAHolder> ValidDNA = context.getSpecificDNAHolders(context.skinDNAsRegex);
         context.instantiateDNASliders(ValidDNA);
     }
 }
@@ -604,7 +622,7 @@ public class DebugAllDNAState : CreatorState
 
     void reloadDNA_Sliders()
     {
-        List<DNAPanel.DNAHolder> ValidDNA = context.getSpecificDNAHolders("^.*$");
+        List<AvatarDNAHolder> ValidDNA = context.getSpecificDNAHolders("^.*$");
         context.instantiateDNASliders(ValidDNA);
     }
 }
